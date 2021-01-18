@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/ZoeyF75/TinyApp/issues"
   },
-  "homepage": "https://github.com/ZoeyF75/TinyApp#readme"
+  "homepage": "https://github.com/ZoeyF75/TinyApp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }

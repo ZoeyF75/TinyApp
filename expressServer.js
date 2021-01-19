@@ -38,18 +38,14 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urlsShow" , templateVars);
 });
 app.get("/u/:shortURL", (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
-    const longURL = urlDatabase[req.params.shortURL].longURL;
-    longURL === undefined ? res.status(302) : res.redirect(longURL); //302 redirection code/ resource requested has been moved
-  } else {
-    res.status(404).send("");
-  }
+  const longURL = urlDatabase[req.params.shortURL];
+  longURL === undefined ? res.status(302) : res.redirect(longURL); //302 redirection code/ resource requested has been moved
 });
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {longURL: req.body['longURL']}; //updates database object
+  urlDatabase[shortURL] = req.body['longURL']; //updates database object
   res.redirect(`u/${shortURL}`);
 });
 

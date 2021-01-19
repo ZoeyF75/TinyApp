@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+//converts the request body from a Buffer into string, adds the data to the req object under the key body
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({extended: true}));
+
 function generateRandomString() {
   let alphanumeric = '';
   for (let i = 0; i < 3; i++) {
@@ -18,11 +22,6 @@ const urlDatabase = {
 
 //tells express app to use ejs as its templating engine
 app.set("view engine", "ejs");
-
-//converts the request body from a Buffer into string, adds the data to the req object under the key body
-const bodyParser = require("body-parser");
-const { request } = require("express");
-app.use(bodyParser.urlencoded({extended: true}));
 
 //get routes
 app.get("/urls", (req, res) => {

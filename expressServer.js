@@ -3,8 +3,12 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 function generateRandomString() {
-  let ranNum = Math.floor(Math.random()*9);
-  //let ranLet = Math.random().toString(36);
+  let alphanumeric = '';
+  for (let i = 0; i < 3; i++) {
+  alphanumeric += Math.floor(Math.random()*9);
+  alphanumeric += Math.random().toString(36).slice(2,3);  
+  }
+  return alphanumeric;
 };
 
 const urlDatabase = {
@@ -31,13 +35,23 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-res.render("urlsShow" , templateVars);
+  res.render("urlsShow" , templateVars);
 });
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok'
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body['longURL']; //updates database object
+  res.redirect(urlDatabase[shortURL]);
 });
+
+//redirect
+// app.get("/u/:shortURL", (req, res) => {
+//   //const longURL = urlDatabase[];
+//   console.log(urlDatabase);
+//   //res.redirect(longURL);
+// });
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

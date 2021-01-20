@@ -37,6 +37,15 @@ function generateRandomString() {
   return alphanumeric;
 };
 
+function findEmail(emailInput) {
+  for (let u in users) {
+    if (users[u].email === emailInput) {
+      return true;
+    }
+  }
+  return false;
+}
+
 //tells express app to use ejs as its templating engine
 app.set("view engine", "ejs");
 
@@ -47,7 +56,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user');
+  res.clearCookie('userID');
   res.redirect('/urls');
 });
 
@@ -57,10 +66,18 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const userRandomID = generateRandomString();
-  users[userRandomID] = { id: userRandomID, email: req.body.email, password: req.body.password };
-  res.cookie('userID', userRandomID);
-  res.redirect('/urls');
+  if (req.body.email === '' || req.body.password === '') {
+    res.redirect('400');
+  } else if (findEmail(req.body.email)) {
+    res.redirect('400');
+  } else {
+    const userRandomID = generateRandomString();
+    users[userRandomID] = { id: userRandomID, email: req.body.email, password: req.body.password };
+    res.cookie('userID', userRandomID);
+    res.redirect('/urls');
+  }
+  console.log(findEmail(req.body.email));
+  console.log(users);
 });
 
 app.get("/urls", (req, res) => {
@@ -79,7 +96,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  longURL === undefined ? res.status(302) : res.redirect(longURL); //302 redirection code/ resource requested has been moved
+  longURL ? res.redirect(longURL): res.redirect('404');  //302 redirection code/ resource requested has been moved
 });
 
 app.post("/urls", (req, res) => {
@@ -99,6 +116,12 @@ app.post("/urls/:shortURL", (req,res) => {
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.newURL; //updates database
   res.redirect('/urls');
+});
+
+app.get("*", (req,res) => {
+  const templateVars = { user: users[req.cookies["userID"]] };
+  res.status(404);
+  res.render('404', templateVars);
 });
 
 app.listen(PORT, () => {

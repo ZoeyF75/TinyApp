@@ -19,10 +19,14 @@
   },
   "homepage": "https://github.com/ZoeyF75/TinyApp#readme",
   "dependencies": {
+    "cookie": "^0.4.1",
+    "cookie-parser": "^1.4.5",
     "ejs": "^3.1.5",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "parser": "^0.1.4"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
     "nodemon": "^2.0.7"
   }
 }

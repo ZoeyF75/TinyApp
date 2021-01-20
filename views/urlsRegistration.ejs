@@ -12,21 +12,22 @@
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
 
-    <h3>Register for an Account</h3>
+    <h3>Create Account</h3>
 
       <form method="POST" action="/register"
       <p>
         <label> Please register below or <a class="nav-item nav-link" href="/login">login</a> if you already have an account. </label>
         <!-- have to make link all in one line -->
       </p>
+      
         <div>
-
-          
-          <input class="form-control" type="email" name="email" placeholder="Email" style="width: 300px; margin: 1em" </input>
+          <label for="email">Email Address:</label>
+          <input class="form-control" type="email" name="email" placeholder="Enter email" style="width: 300px; margin: 1em" </input>
+          <label for="password">Password:</label>
           <input class="form-control"type="password" name="password" placeholder="Password" style="width: 300px; margin: 1em" </input>
 
         </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">Register</button>
       </form>
 
 </main>

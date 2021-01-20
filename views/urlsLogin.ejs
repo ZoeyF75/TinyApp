@@ -17,14 +17,17 @@
     <label> Please login or <a class="nav-item nav-link" href="/Register">register</a> to create an acount. </label>
     
     <form method="POST" action="/login"
-      <div>
 
-        <input class="form-control" type="email" name="email" placeholder="Email" style="width: 300px; margin: 1em" </input>
-        <input class="form-control"type="password" name="password" placeholder="Password" style="width: 300px; margin: 1em" </input>
+      <div>
+        <label for="email">Email Address:</label>
+        <input class="form-control" type="email" name="email" placeholder="Enter email" style="width: 300px; margin: 1em; " </input>
+        <label for="password">Password:</label>
+        <input class="form-control"type="password" name="password" placeholder="Password" style="width: 300px; margin: 1em;" </input>
 
       </div>
 
       <button type="submit" class="btn btn-primary">Login</button>
+      
     </form>
       
   </main>

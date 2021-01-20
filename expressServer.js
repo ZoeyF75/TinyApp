@@ -40,7 +40,7 @@ function generateRandomString() {
 function findEmail(emailInput) {
   for (let u in users) {
     if (users[u].email === emailInput) {
-      return true;
+      return users[u];
     }
   }
   return false;
@@ -55,9 +55,20 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  //have to update to coincide with registration implementation
-  // res.cookie('username',req.body.username);
-  // res.redirect('/urls');
+  if (req.body.email === '' || req.body.password === '') {
+    res.status(404).send("Feilds are empty");
+  } else if (findEmail(req.body.email)) { 
+    if(findEmail(req.body.email).password === req.body.password) {
+      const userRandomID = generateRandomString();
+      users[userRandomID] = { id: userRandomID, email: req.body.email, password: req.body.password };
+      res.cookie('userID', userRandomID);
+      res.redirect('/urls');
+    } else {
+      res.status(403).send("Password does not match email.");
+    }
+  } else {
+    res.status(403).send("User does not exist.");
+  }
 });
 
 app.post("/logout", (req, res) => {
@@ -72,17 +83,15 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
-    res.redirect('404');
-  } else if (findEmail(req.body.email)) {
-    res.redirect('404');
-  } else {
+    res.status(404).send("Feilds are empty");
+  } else if (findEmail(req.body.email) === false) { //if email is not found
     const userRandomID = generateRandomString();
     users[userRandomID] = { id: userRandomID, email: req.body.email, password: req.body.password };
     res.cookie('userID', userRandomID);
     res.redirect('/urls');
+  } else {
+    res.status(404).send("Page not found :(");
   }
-  console.log(findEmail(req.body.email));
-  console.log(users);
 });
 
 //redirects to new page if longURL given by user is valid
@@ -134,8 +143,8 @@ app.post("/urls", (req, res) => {
 //gets 404 page
 app.get("*", (req,res) => {
   const templateVars = { user: users[req.cookies["userID"]] };
-  res.status(404);
-  res.render('404', templateVars);
+  console.log(req.url);
+  res.status(404) ? res.render('404', templateVars) : res.render('403', templateVars);
 });
 
 app.listen(PORT, () => {

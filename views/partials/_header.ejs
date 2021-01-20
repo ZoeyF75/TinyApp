@@ -11,13 +11,14 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <a class="nav-item nav-link" href="/Register">register</a>
       </div>
 
-      <div> <% if (username) { %>
+      <div> <% if (user) { %>
 
         <form method="POST" action="/logout" class="form-inline">
-          
-        <label> Logged In As: <%=username%></label>
+        
+        <label> Logged In As: <%=user.email%></label>
         <button type="submit" style="background-color:white; border-color:rgb(43, 180, 8); color:rgb(43, 180, 8)"class="btn btn-primary">Logout</button>
         </form>
 

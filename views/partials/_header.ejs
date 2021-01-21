@@ -17,12 +17,8 @@
     <div> <% if (user) { %>
 
       <form method="POST" action="/logout" class="form-inline">
-        <span class="navbar-text"></span>
-          Logged In As: <%=user.email%>____ 
-          <!-- need to figure out how to space        -->
-        </span>
-
-      <button type="submit" style="background-color:white; border-color:rgb(43, 180, 8); color:rgb(43, 180, 8)"class="btn btn-primary">Logout</button>
+        <a class="nav-item nav-link disabled" href="#">Logged In As: <%=user.email%></a>
+         <button type="submit" style="background-color:white; border-color:rgb(43, 180, 8); color:rgb(43, 180, 8)"class="btn btn-primary">Logout</button>
       </form>
 
     <% } else { %>

@@ -49,12 +49,18 @@ function findEmail(emailInput) {
 function urlsForUser(id) {
   const userBase = {};
   for(let u in urlDatabase) {
-    if (urlDatabase[u].userID === id) {
-      userBase[u] = urlDatabase[u];
+    if (urlDatabase[u].userID === id) { //if database at the shortURL of the userID key equals id
+      userBase[u] = urlDatabase[u]; //adds key 
     }
   }
   return userBase;
 };
+
+function checkPermission(userDatabase) {
+  if (Object.keys(userDatabase).includes(req.params.id)) { //if users database includes the shortURL it can be edited/deleted
+    urlDatabase[req.params.shortURL].longURL = req.body.newURL; //updates user database
+  }
+}
 
 //tells express app to use ejs as its templating engine
 app.set("view engine", "ejs");
@@ -93,14 +99,14 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
-    res.status(404).send("Feilds are empty");
+    res.status(404).send("Fields are empty");
   } else if (findEmail(req.body.email) === false) { //if email is not found
     const userRandomID = generateRandomString();
     users[userRandomID] = { id: userRandomID, email: req.body.email, password: req.body.password };
     res.cookie('userID', userRandomID);
     res.redirect('/urls');
   } else {
-    res.status(404).send("Page not found :(");
+    res.status(404).send("Error, your inputs were invalid.");
   }
 });
 
@@ -118,22 +124,28 @@ app.get("/urls/new", (req, res) => {
 
 //Renders edit page to change shortURL
 app.get("/urls/:shortURL", (req, res) => {
+  console.log(req.params.shortURL);
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies["userID"]] , urlUserID: urlDatabase[req.params.shortURL].userID};
   res.render("urlsShow" , templateVars);
 });
 
 //updates the users edits to urls
 app.post("/urls/:shortURL", (req,res) => {
-  const shortURL = req.params.shortURL;
-  //console.log(req.body.newURL['longURL']);
-  urlDatabase[shortURL] = req.body['longURL']; //updates database
-  res.redirect('/urls');
+  const userBase = urlsForUser(req.cookies['userID']);
+  if (urlDatabase[req.params.shortURL]) { //if users database includes the shortURL it can be edited
+    urlDatabase[req.params.shortURL].longURL = req.body.newURL; //updates database
+    res.redirect('/urls');
+  } else {
+    res.redirect('/urls/new');
+  }
 });
 
 //delete button that when requested removes URL
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
+  if (urlDatabase[req.params.shortURL]) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
+  }
   res.redirect('/urls');
 });
 

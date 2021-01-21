@@ -1,14 +1,13 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-
+const bcrypt = require('bcrypt');
 //converts the request body from a Buffer into string, adds the data to the req object under the key body
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
-
 const cookieParser = require('cookie-parser');
-const { request } = require("express");
 app.use(cookieParser());
+let hashedPassword;
 
 const users = { 
   "userRandomID": {
@@ -56,12 +55,6 @@ function urlsForUser(id) {
   return userBase;
 };
 
-function checkPermission(userDatabase) {
-  if (Object.keys(userDatabase).includes(req.params.id)) { //if users database includes the shortURL it can be edited/deleted
-    urlDatabase[req.params.shortURL].longURL = req.body.newURL; //updates user database
-  }
-}
-
 //tells express app to use ejs as its templating engine
 app.set("view engine", "ejs");
 
@@ -71,14 +64,17 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  console.log(findEmail(req.body.email).password);
+  //console.log('password:',req.body.password, 'hashword:', users.userID.password);
   if (req.body.email === '' || req.body.password === '') {
-    res.status(404).send("Feilds are empty");
+    res.status(404).send("Please ensure that none of the fields were left empty.");
   } else if (findEmail(req.body.email)) { 
-    if(findEmail(req.body.email).password === req.body.password) {
-      const userRandomID = generateRandomString();
-      users[userRandomID] = { id: userRandomID, email: req.body.email, password: req.body.password };
-      res.cookie('userID', userRandomID);
+      if (bcrypt.compareSync(req.body.password, findEmail(req.body.email).password)) { //clear userID cookie
+      // const userRandomID = generateRandomString();
+      // users[userRandomID] = { id: userRandomID, email: req.body.email, password: hashedPassword };
+      res.cookie('userID', findEmail(req.body.email).id);
       res.redirect('/urls');
+      console.log('users:', users);
     } else {
       res.status(403).send("Password does not match email.");
     }
@@ -99,14 +95,14 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
-    res.status(404).send("Fields are empty");
+    res.status(404).send("Please ensure that none of the fields were left empty.");
   } else if (findEmail(req.body.email) === false) { //if email is not found
     const userRandomID = generateRandomString();
-    users[userRandomID] = { id: userRandomID, email: req.body.email, password: req.body.password };
-    res.cookie('userID', userRandomID);
+    users[userRandomID] = { id: userRandomID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10)};
+    res.cookie('userID', userRandomID); 
     res.redirect('/urls');
   } else {
-    res.status(404).send("Error, your inputs were invalid.");
+    res.status(404).send("This email already exsist please use a different one or login.");
   }
 });
 
@@ -131,12 +127,11 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //updates the users edits to urls
 app.post("/urls/:shortURL", (req,res) => {
-  const userBase = urlsForUser(req.cookies['userID']);
-  if (urlDatabase[req.params.shortURL]) { //if users database includes the shortURL it can be edited
+  if (urlDatabase[req.params.shortURL]) { //if users database has the shortURL it can be edited
     urlDatabase[req.params.shortURL].longURL = req.body.newURL; //updates database
     res.redirect('/urls');
   } else {
-    res.redirect('/urls/new');
+    res.status(403).send("You are not authorized to remove or edit this url.");
   }
 });
 
@@ -146,7 +141,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   }
-  res.redirect('/urls');
+  res.status(403).send("You are not authorized to remove or edit this url.");
 });
 
 //My URLS page

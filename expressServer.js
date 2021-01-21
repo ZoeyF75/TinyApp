@@ -24,8 +24,8 @@ const users = {
 }
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: '' },
+  "9sm5xK": { longURL: "http://www.google.com", userID: '' }
 };
 
 function generateRandomString() {
@@ -45,6 +45,16 @@ function findEmail(emailInput) {
   }
   return false;
 }
+
+function urlsForUser(id) {
+  const userBase = {};
+  for(let u in urlDatabase) {
+    if (urlDatabase[u].userID === id) {
+      userBase[u] = urlDatabase[u];
+    }
+  }
+  return userBase;
+};
 
 //tells express app to use ejs as its templating engine
 app.set("view engine", "ejs");
@@ -96,26 +106,27 @@ app.post("/register", (req, res) => {
 
 //redirects to new page if longURL given by user is valid
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  longURL ? res.redirect(longURL): res.redirect('404');  //302 redirection code/ resource requested has been moved
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+  longURL === undefined ? res.status(302).send("Resource requested has been moved or no longer exsists.") : res.redirect(longURL);  //302 redirection code/ resource requested has been moved
 });
 
 //create new shortURL route
 app.get("/urls/new", (req, res) => {
   const templateVars = { user: users[req.cookies["userID"]], users };
-  res.render('urlsNew', templateVars);
+  req.cookies["userID"] ? res.render('urlsNew', templateVars) : res.redirect('/login');
 });
 
 //Renders edit page to change shortURL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies["userID"]] , users};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies["userID"]] , urlUserID: urlDatabase[req.params.shortURL].userID};
   res.render("urlsShow" , templateVars);
 });
 
 //updates the users edits to urls
 app.post("/urls/:shortURL", (req,res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.newURL; //updates database
+  //console.log(req.body.newURL['longURL']);
+  urlDatabase[shortURL] = req.body['longURL']; //updates database
   res.redirect('/urls');
 });
 
@@ -128,7 +139,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //My URLS page
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: users[req.cookies["userID"]], users };
+  const templateVars = { urls: urlsForUser(req.cookies['userID']), user: users[req.cookies["userID"]], users };
   res.render('urlsIndex', templateVars);
 });
 
@@ -136,7 +147,7 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body['longURL']; //updates database object
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies['userID']}; //updates database object
   res.redirect(`u/${shortURL}`);
 });
 

@@ -22,10 +22,11 @@
         </tr>
       </thead>
       <tbody>
+        <% if (user) { %>
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= urls[url].longURL %></td>
             <td><form method="GET" action="/urls/<%= url %>"> <!--edit link-->
               <button type="submit" style="background-color:white; border-color:rgb(43, 180, 8); color:rgb(43, 180, 8)"class="btn btn-primary">Edit</button>
             </form>
@@ -35,6 +36,13 @@
             </form>
           </td>
           </tr>
+        <% } %>
+        <% } else { %>
+          
+            <div class="alert alert-info" role="alert">
+              Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">register</a> to begin.
+            </div>
+
         <% } %>
       </tbody>
     </table>

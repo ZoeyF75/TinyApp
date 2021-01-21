@@ -14,20 +14,21 @@
   <main style="margin: 1em;">
     
     <h3>Login</h3>
-    <label> Please login or <a class="nav-item nav-link" href="/Register">register</a> to create an acount. </label>
-    
+    <div class="alert alert-info" role="alert">
+      <label> Please login or <a class="alert-link" style: href="/Register">register</a> to create an acount. </label>
+    </div>
+
     <form method="POST" action="/login"
-
-      <div>
+      <div class="form-group">
         <label for="email">Email Address:</label>
-        <input class="form-control" type="email" name="email" placeholder="Enter email" style="width: 300px; margin: 1em; " </input>
-        <label for="password">Password:</label>
-        <input class="form-control"type="password" name="password" placeholder="Password" style="width: 300px; margin: 1em;" </input>
-
+        <input class="form-control" type="email" name="email" placeholder="Enter email" </input>
       </div>
-
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input class="form-control"type="password" name="password" placeholder="Password"</input>
+      </div>
+      </div>
       <button type="submit" class="btn btn-primary">Login</button>
-      
     </form>
       
   </main>

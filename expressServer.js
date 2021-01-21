@@ -5,9 +5,12 @@ const bcrypt = require('bcrypt');
 //converts the request body from a Buffer into string, adds the data to the req object under the key body
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
-let hashedPassword;
+const cookieSession = require('cookie-session');
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ['123banana']
+}));
 
 const users = { 
   "userRandomID": {
@@ -59,20 +62,18 @@ function urlsForUser(id) {
 app.set("view engine", "ejs");
 
 app.get("/login", (req, res) => {
-  const templateVars = { user: users[req.cookies["userID"]], users };
+  const templateVars = { user: users[req.session.userID], users };
   res.render('urlsLogin.ejs', templateVars);
 });
 
 app.post("/login", (req, res) => {
-  console.log(findEmail(req.body.email).password);
-  //console.log('password:',req.body.password, 'hashword:', users.userID.password);
   if (req.body.email === '' || req.body.password === '') {
     res.status(404).send("Please ensure that none of the fields were left empty.");
   } else if (findEmail(req.body.email)) { 
       if (bcrypt.compareSync(req.body.password, findEmail(req.body.email).password)) { //clear userID cookie
       // const userRandomID = generateRandomString();
       // users[userRandomID] = { id: userRandomID, email: req.body.email, password: hashedPassword };
-      res.cookie('userID', findEmail(req.body.email).id);
+      req.session.userID = findEmail(req.body.email).id;
       res.redirect('/urls');
       console.log('users:', users);
     } else {
@@ -84,12 +85,12 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('userID');
+  req.session = null;
   res.redirect('/urls');
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { user: users[req.cookies["userID"]], users };
+  const templateVars = { user: users[req.session.userID], users };
   res.render('urlsRegistration.ejs', templateVars);
 });
 
@@ -99,7 +100,7 @@ app.post("/register", (req, res) => {
   } else if (findEmail(req.body.email) === false) { //if email is not found
     const userRandomID = generateRandomString();
     users[userRandomID] = { id: userRandomID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10)};
-    res.cookie('userID', userRandomID); 
+    req.session.userID = userRandomID; 
     res.redirect('/urls');
   } else {
     res.status(404).send("This email already exsist please use a different one or login.");
@@ -114,14 +115,13 @@ app.get("/u/:shortURL", (req, res) => {
 
 //create new shortURL route
 app.get("/urls/new", (req, res) => {
-  const templateVars = { user: users[req.cookies["userID"]], users };
-  req.cookies["userID"] ? res.render('urlsNew', templateVars) : res.redirect('/login');
+  const templateVars = { user: users[req.session.userID], users };
+  req.session.userID ? res.render('urlsNew', templateVars) : res.redirect('/login');
 });
-
 //Renders edit page to change shortURL
 app.get("/urls/:shortURL", (req, res) => {
   console.log(req.params.shortURL);
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies["userID"]] , urlUserID: urlDatabase[req.params.shortURL].userID};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.session.userID] , urlUserID: urlDatabase[req.params.shortURL].userID};
   res.render("urlsShow" , templateVars);
 });
 
@@ -146,7 +146,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //My URLS page
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlsForUser(req.cookies['userID']), user: users[req.cookies["userID"]], users };
+  const templateVars = { urls: urlsForUser(req.session['userID']), user: users[req.session.userID], users };
   res.render('urlsIndex', templateVars);
 });
 
@@ -154,13 +154,13 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies['userID']}; //updates database object
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.userID}; //updates database object
   res.redirect(`u/${shortURL}`);
 });
 
 //gets 404 page
 app.get("*", (req,res) => {
-  const templateVars = { user: users[req.cookies["userID"]] };
+  const templateVars = { user: users[req.session.userID] };
   console.log(req.url);
   res.status(404) ? res.render('404', templateVars) : res.render('403', templateVars);
 });

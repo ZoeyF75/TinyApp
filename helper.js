@@ -4,7 +4,7 @@ function findEmail(emailInput, users) {
       return users[u];
     }
   }
-  return false;
+  return undefined;
 }
 
 module.exports = findEmail;

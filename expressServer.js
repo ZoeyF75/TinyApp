@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bcrypt = require('bcrypt');
+const findEmail = require('./helper');
 //converts the request body from a Buffer into string, adds the data to the req object under the key body
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -39,14 +40,6 @@ function generateRandomString() {
   return alphanumeric;
 };
 
-function findEmail(emailInput) {
-  for (let u in users) {
-    if (users[u].email === emailInput) {
-      return users[u];
-    }
-  }
-  return false;
-}
 
 function urlsForUser(id) {
   const userBase = {};
@@ -69,11 +62,11 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     res.status(404).send("Please ensure that none of the fields were left empty.");
-  } else if (findEmail(req.body.email)) { 
-      if (bcrypt.compareSync(req.body.password, findEmail(req.body.email).password)) { //clear userID cookie
+  } else if (findEmail(req.body.email, users)) { 
+      if (bcrypt.compareSync(req.body.password, findEmail(req.body.email, users).password)) { //clear userID cookie
       // const userRandomID = generateRandomString();
       // users[userRandomID] = { id: userRandomID, email: req.body.email, password: hashedPassword };
-      req.session.userID = findEmail(req.body.email).id;
+      req.session.userID = findEmail(req.body.email, users).id;
       res.redirect('/urls');
       console.log('users:', users);
     } else {
@@ -97,7 +90,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     res.status(404).send("Please ensure that none of the fields were left empty.");
-  } else if (findEmail(req.body.email) === false) { //if email is not found
+  } else if (findEmail(req.body.email, users) === false) { //if email is not found
     const userRandomID = generateRandomString();
     users[userRandomID] = { id: userRandomID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10)};
     req.session.userID = userRandomID; 

@@ -9,13 +9,18 @@
 
     <title>New URL - TinyApp Example</title>
   </head>
-
   <body>
 
     <%- include('partials/_header') %>
 
     <main style="margin: 1em;">
       <h3>Create TinyURL</h3>
+      <% if (!user) { %>
+        <div class="alert alert-danger" role="alert">
+          Your URLS wont save if you aren't logged in.
+          Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">register</a> to save your shortened urls.
+      </div>
+      <% } %>
       <form class="form-inline" action="/urls" method="POST">
         <div class="form-group mb-2">
           <label for="longURL">Enter a URL:</label>

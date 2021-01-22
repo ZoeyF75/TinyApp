@@ -12,6 +12,11 @@
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
     <h3>My URLs</h3>
+    <% if (user) { %> 
+      <div class="alert alert-success" role="alert">
+        <label> Create a New Short Link <a class="alert-link" style: href="/urls/new">here</a></label>
+      </div>
+    <% } %>
     <table class="table">
       <thead>
         <tr>

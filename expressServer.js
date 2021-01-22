@@ -44,18 +44,19 @@ function urlsForUser(id) {
 //routes below
 app.get("/register", (req, res) => {
   const templateVars = { user: users[req.session.userID], users };
-  res.render('urlsRegistration.ejs', templateVars);
+  return res.render('urlsRegistration.ejs', templateVars);
+
 });
 
 app.get("/login", (req, res) => {
   const templateVars = { user: users[req.session.userID] };
-  res.render('urlsLogin.ejs', templateVars);
+  return res.render('urlsLogin.ejs', templateVars);
 });
 
 //My URLS page
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlsForUser(req.session.userID), user: users[req.session.userID], users };
-  res.render('urlsIndex', templateVars);
+  return res.render('urlsIndex', templateVars);
 });
 //create new shortURL route
 app.get("/urls/new", (req, res) => {
@@ -64,9 +65,12 @@ app.get("/urls/new", (req, res) => {
 });
 //Renders edit page to change shortURL
 app.get("/urls/:shortURL", (req, res) => {
-  console.log(req.params.shortURL);
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.session.userID] , urlUserID: urlDatabase[req.params.shortURL].userID };
-  res.render("urlsShow" , templateVars);
+  if (urlDatabase[req.params.shortURL]) {
+    const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.session.userID] , urlUserID: urlDatabase[req.params.shortURL].userID };
+    res.render("urlsShow" , templateVars);
+  } else {
+    return res.status(404).send("Page not found.")
+  }
 });
 
 //redirects to new page if longURL given by user is valid
@@ -86,7 +90,7 @@ app.get("*", (req,res) => {
 app.post("/urls/:shortURL", (req,res) => {
   if (urlDatabase[req.params.shortURL]) { //if users database has the shortURL it can be edited
     urlDatabase[req.params.shortURL].longURL = req.body.newURL; //updates database
-    res.redirect('/urls');
+    return res.redirect('/urls');
   } else {
     res.status(403).send("You are not authorized to remove or edit this url.");
   }
@@ -96,7 +100,7 @@ app.post("/urls/:shortURL", (req,res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     delete urlDatabase[req.params.shortURL];
-    res.redirect('/urls');
+    return res.redirect('/urls');
   }
   res.status(403).send("You are not authorized to remove or edit this url.");
 });
@@ -105,7 +109,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.userID}; //updates database object
-  res.redirect(`u/${shortURL}`);
+  return res.redirect(`u/${shortURL}`);
 });
 
 app.post("/register", (req, res) => {
@@ -122,23 +126,24 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  console.log(req.body.password);
   if (req.body.email === '' || req.body.password === '') {
-    res.status(404).send("Please ensure that none of the fields were left empty.");
+    return res.status(404).send("Please ensure that none of the fields were left empty.");
   } else if (findEmail(req.body.email, users)) { 
       if (bcrypt.compareSync(req.body.password, findEmail(req.body.email, users).password)) { 
       req.session.userID = findEmail(req.body.email, users).id;
       res.redirect('/urls');
     } else {
-      res.status(403).send("Password does not match email.");
+      return res.status(403).send("Password or email does not match.");
     }
   } else {
-    res.status(403).send("User does not exist.");
+    return res.status(403).send("User does not exist.");
   }
 });
 
 app.post("/logout", (req, res) => {
   req.session = null;
-  res.redirect('/login');
+  return res.redirect('/login');
 });
 
 app.listen(PORT, () => {

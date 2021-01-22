@@ -10,23 +10,23 @@ function findEmail(emailInput, users) {
 function generateRandomString() {
   let alphanumeric = '';
   for (let i = 0; i < 6; i++) {
-  alphanumeric += Math.random().toString(36).slice(2,3);  
+    alphanumeric += Math.random().toString(36).slice(2,3);
   }
   return alphanumeric;
-};
+}
 
 function urlsForUser(id, urlDatabase) {
   const userBase = {};
-  for(let u in urlDatabase) {
+  for (let u in urlDatabase) {
     if (urlDatabase[u].userID === id) { //if database at the shortURL of the userID key equals id
-      userBase[u] = urlDatabase[u]; //adds key 
+      userBase[u] = urlDatabase[u]; //adds key
     }
   }
   return userBase;
-};
+}
 
 module.exports = {
   findEmail,
   generateRandomString,
   urlsForUser
-}
+};

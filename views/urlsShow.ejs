@@ -5,14 +5,17 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>URL - TinyApp Example</title>
 </head>
-
 <body>
+
   <%- include('partials/_header') %>
+  
+  <!--button is for functionality of edit button-->
   <% let button = true %>
 
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
+
         <!-- //if user is not logged in -->
         <% if (!user) { %> 
           <% button = false %>
@@ -20,6 +23,7 @@
               You cannot make any changes to this link.
               Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">register</a> to view your own shortened urls.
           </div>
+
           <!-- //if user is logged in but link is not in their database-->
         <% } else if (user.id !== urlUserID) { %>
           <% button = false %>
@@ -31,19 +35,25 @@
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
       </div>
+
     <div class="card-footer text-muted"></div>
     <div class="card-footer text-muted">
+
       <h3>Edit</h3>
+
+      <!--Edit/Update url form with input and update button-->
       <form action="/urls/<%= shortURL %>" method="POST"> <!--post form-->
-       <label for="newURL">New URL:</label>
-       <input type="text" name="newURL" placeholder="http://" >
+        <label for="newURL">New URL:</label>
+        <input type="text" name="newURL" placeholder="http://" >
+        
        <!-- introduced button variable that is disabled if the link is not the users-->
        <% if (!button) { %>
         <button type="submit" class="btn btn-primary" disabled>Update</button> 
        <% } else { %>
-       <button type="submit" class="btn btn-primary" >Update</button> 
+        <button type="submit" class="btn btn-primary" >Update</button> 
        <% } %>
       </form> 
+
     </div>
   </div>
 

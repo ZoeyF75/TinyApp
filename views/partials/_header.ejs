@@ -7,27 +7,27 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
 
+    <!--If theres a user logged in displayed logged in as in the header-->
     <div> <% if (user) { %>
-
       <form method="POST" action="/logout" class="form-inline">
         <a class="nav-item nav-link disabled" href="#">Logged In As: <%=user.email%></a>
          <button type="submit" style="background-color:white; border-color:rgb(43, 180, 8); color:rgb(43, 180, 8)"class="btn btn-primary">Logout</button>
       </form>
 
+    <!--If there isn't a user logged in display links to register and login in the header-->
     <% } else { %>
-  
     </div> 
     <div class="navbar-nav">
       <a class="nav-item nav-link" href="/Register">Register</a>
       <a class="nav-item nav-link" href="/login">Login</a>
     </div>
     <% } %>
+    
   </nav>
 </header>

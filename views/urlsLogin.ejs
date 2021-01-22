@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -10,23 +11,29 @@
 
 </head>
 <body>
+
   <%- include('partials/_header') %>
+
   <main style="margin: 1em;">
-    
     <h3>Login</h3>
+
+    <!--Message to user with link to register-->
     <div class="alert alert-info" role="alert">
       <label> Please login or <a class="alert-link" style: href="/Register">register</a> to create an acount. </label>
     </div>
 
+    <!--Login form with an email and password input and a submit button-->
     <form method="POST" action="/login"
       <div class="form-group">
         <label for="email">Email Address:</label>
         <input class="form-control" type="email" name="email" placeholder="Enter email" </input>
       </div>
+
       <div class="form-group">
         <label for="password">Password:</label>
         <input class="form-control"type="password" name="password" placeholder="Password"</input>
       </div>
+
       </div>
       <button type="submit" class="btn btn-primary">Login</button>
     </form>

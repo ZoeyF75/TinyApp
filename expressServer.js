@@ -9,8 +9,10 @@ const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const app = express();
 const PORT = 8080; // default port 8080
-const users = {}
+const users = {};
 const urlDatabase = {};
+
+//req.session.userID name of the cookie
 
 //tells express app to use ejs as its templating engine
 app.set("view engine", "ejs");
@@ -24,48 +26,48 @@ app.use(cookieSession({
 
 //routes below
 app.get("/register", (req, res) => {
-  const templateVars = { 
-    user: users[req.session.userID] 
+  const templateVars = {
+    user: users[req.session.userID]
   };
   return res.render('urlsRegistration.ejs', templateVars);
 });
 
 app.get("/login", (req, res) => {
-  const templateVars = { 
-    user: users[req.session.userID] 
+  const templateVars = {
+    user: users[req.session.userID]
   };
   return res.render('urlsLogin.ejs', templateVars);
 });
 
 //My URLS page
 app.get("/urls", (req, res) => {
-  const templateVars = { 
-    urls: urlsForUser(req.session.userID, urlDatabase), 
+  const templateVars = {
+    urls: urlsForUser(req.session.userID, urlDatabase),
     user: users[req.session.userID]
-   };
+  };
   return res.render('urlsIndex', templateVars);
 });
 
 //create new shortURL route
 app.get("/urls/new", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     user: users[req.session.userID]
-   };
+  };
   req.session.userID ? res.render('urlsNew', templateVars) : res.redirect('/login');
 });
 
 //Renders edit page to change shortURL
 app.get("/urls/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
-    const templateVars = { 
-      shortURL: req.params.shortURL, 
-      longURL: urlDatabase[req.params.shortURL].longURL, 
-      user: users[req.session.userID] , 
-      urlUserID: urlDatabase[req.params.shortURL].userID 
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      user: users[req.session.userID],
+      urlUserID: urlDatabase[req.params.shortURL].userID
     };
     res.render("urlsShow" , templateVars);
   } else {
-    return res.status(404).send("Page not found.")
+    return res.status(404).send("Page not found.");
   }
 });
 
@@ -77,8 +79,8 @@ app.get("/u/:shortURL", (req, res) => {
 
 //gets 404 page
 app.get("*", (req,res) => {
-  const templateVars = { 
-    user: users[req.session.userID] 
+  const templateVars = {
+    user: users[req.session.userID]
   };
   res.render('404', templateVars);
 });
@@ -105,8 +107,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //My URLS with user inputs of URLS
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = { 
-    longURL: req.body.longURL, 
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
     userID: req.session.userID}; //updates database object
   return res.redirect(`u/${shortURL}`);
 });
@@ -116,12 +118,12 @@ app.post("/register", (req, res) => {
     res.status(404).send("Please ensure that none of the fields were left empty.");
   } else if (!findEmail(req.body.email, users)) { //if email is not found
     const userRandomID = generateRandomString();
-    users[userRandomID] = { 
-      id: userRandomID, 
-      email: req.body.email, 
+    users[userRandomID] = {
+      id: userRandomID,
+      email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10)
     };
-    req.session.userID = userRandomID; 
+    req.session.userID = userRandomID;
     res.redirect('/urls');
   } else {
     res.status(404).send("This email already exists please use a different one or login.");
@@ -131,8 +133,9 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   if (req.body.email === '' || req.body.password === '') {
     return res.status(404).send("Please ensure that none of the fields were left empty.");
-  } else if (findEmail(req.body.email, users)) { 
-      if (bcrypt.compareSync(req.body.password, findEmail(req.body.email, users).password)) { 
+  } else if (findEmail(req.body.email, users)) {
+    //compares password used to login to the password of the email entered in the users object
+    if (bcrypt.compareSync(req.body.password, findEmail(req.body.email, users).password)) { 
       req.session.userID = findEmail(req.body.email, users).id;
       res.redirect('/urls');
     } else {

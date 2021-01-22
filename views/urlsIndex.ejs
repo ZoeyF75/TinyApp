@@ -9,15 +9,22 @@
   <title>TinyApp</title>
 </head>
 <body>
+
   <%- include('partials/_header') %>
+
   <main style="margin: 1em;">
     <h3>My URLs</h3>
+
+    <!--if a user is logged in display a link to create a new url-->
     <% if (user) { %> 
       <div class="alert alert-success" role="alert">
         <label> Create a New Short Link <a class="alert-link" style: href="/urls/new">here</a></label>
       </div>
     <% } %>
+
     <table class="table">
+      
+      <!--heading links-->
       <thead>
         <tr>
           <th scope="col">Short URL</th>
@@ -26,29 +33,37 @@
           <th scope="col">Delete</th>
         </tr>
       </thead>
+
+      <!--if a user is logged in display urls and edit/delete buttons-->
       <tbody>
         <% if (user) { %>
         <% for(let url in urls) { %>
           <tr>
+
             <td><%= url %></td>
             <td><%= urls[url].longURL %></td>
+
             <td><form method="GET" action="/urls/<%= url %>"> <!--edit link-->
               <button type="submit" style="background-color:white; border-color:rgb(43, 180, 8); color:rgb(43, 180, 8)"class="btn btn-primary">Edit</button>
-            </form>
-          </td>
+              </form>
+            </td>
+
             <td><form method="POST" action="/urls/<%= url %>/delete">
               <button type="submit" style="background-color:white; border-color:crimson; color:crimson" class="btn btn-primary">Delete</button>
-            </form>
-          </td>
+               </form>
+            </td>
+
           </tr>
         <% } %>
+
+        <!--if user isn't logged in...-->
         <% } else { %>
           
             <div class="alert alert-info" role="alert">
               Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">register</a> to begin.
             </div>
-
         <% } %>
+        
       </tbody>
     </table>
   </main>

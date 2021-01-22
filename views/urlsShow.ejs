@@ -8,10 +8,26 @@
 
 <body>
   <%- include('partials/_header') %>
+  <% let button = true %>
 
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
+        <!-- //if user is not logged in -->
+        <% if (!user) { %> 
+          <% button = false %>
+          <div class="alert alert-danger" role="alert">
+              You cannot make any changes to this link.
+              Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">register</a> to view your own shortened urls.
+          </div>
+          <!-- //if user is logged in but link is not in their database-->
+        <% } else if (user.id !== urlUserID) { %>
+          <% button = false %>
+          <div class="alert alert-danger" role="alert">
+            You do not have the authorization to make changes to this link.
+          </div>
+        <% } %>
+
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
       </div>
@@ -21,7 +37,12 @@
       <form action="/urls/<%= shortURL %>" method="POST"> <!--post form-->
        <label for="newURL">New URL:</label>
        <input type="text" name="newURL" placeholder="http://" >
-       <button type="submit" class="btn btn-primary" >Submit</button>
+       <!-- introduced button variable that is disabled if the link is not the users-->
+       <% if (!button) { %>
+        <button type="submit" class="btn btn-primary" disabled>Update</button> 
+       <% } else { %>
+       <button type="submit" class="btn btn-primary" >Update</button> 
+       <% } %>
       </form> 
     </div>
   </div>

@@ -5,8 +5,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ## Final Product
 
 !["This is the Registration page! The style of the Login page is very similar."](https://github.com/ZoeyF75/TinyApp/blob/master/docs/Register.jpg?raw=true)
+
 !["This is the main URL page, where a user can acess all their shortened URL's."](https://github.com/ZoeyF75/TinyApp/blob/master/docs/MyURLPage.jpg?raw=true)
+
 !["This is the main URL page when a user visits the /url/:id link without being logged in. A similar message is displayed if the user is logged in but the shortened URL is not in their database."](https://github.com/ZoeyF75/TinyApp/blob/master/docs/NotLoggedIn.jpg?raw=true)
+
 !["This is the Registration page! The style of the Login page is very similar."](https://github.com/ZoeyF75/TinyApp/blob/master/docs/Update.jpg?raw=true)
 
 ## Dependencies

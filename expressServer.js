@@ -34,14 +34,14 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.session.userID]
   };
-  return res.render('urlsRegistration.ejs', templateVars);
+  return !req.session.userID ? res.render('urlsRegistration.ejs', templateVars) : res.redirect('/urls');
 });
 
 app.get("/login", (req, res) => {
   const templateVars = {
     user: users[req.session.userID]
   };
-  return res.render('urlsLogin.ejs', templateVars);
+  return !req.session.userID ? res.render('urlsLogin.ejs', templateVars) : res.redirect('/urls');
 });
 
 //My URLS page
@@ -111,7 +111,8 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: req.session.userID}; //updates database object
+    userID: req.session.userID
+  }; //updates database object
   return res.redirect(`urls/${shortURL}`);
 });
 
@@ -137,7 +138,7 @@ app.post("/login", (req, res) => {
     return res.status(404).send("Please ensure that none of the fields were left empty.");
   } else if (findEmail(req.body.email, users)) {
     //compares password used to login to the password of the email entered in the users object
-    if (bcrypt.compareSync(req.body.password, findEmail(req.body.email, users).password)) { 
+    if (bcrypt.compareSync(req.body.password, findEmail(req.body.email, users).password)) {
       req.session.userID = findEmail(req.body.email, users).id;
       res.redirect('/urls');
     } else {

@@ -89,7 +89,7 @@ app.get("*", (req,res) => {
 
 //updates the users edits to urls
 app.post("/urls/:shortURL", (req,res) => {
-  if (urlDatabase[req.params.shortURL]) { //if users database has the shortURL it can be edited
+  if (urlDatabase[req.params.shortURL] && req.session.userID) { //if users database has the shortURL and the user is logged in it can be edited
     urlDatabase[req.params.shortURL].longURL = req.body.newURL; //updates database
     return res.redirect('/urls');
   } else {

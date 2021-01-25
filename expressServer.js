@@ -24,11 +24,6 @@ app.use(cookieSession({
   keys: ['123banana'] //characters the cookie name is encrypted with
 }));
 
-//home page
-app.get("/", (req, res) => {
-  return req.session.userID ? res.redirect('/urls') : res.redirect('/login');
-});
-
 //routes below
 app.get("/register", (req, res) => {
   const templateVars = {
@@ -80,6 +75,11 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   //if shortURL exsists redirect to shorturl at long url in user database else error
   return urlDatabase[req.params.shortURL] ? res.redirect(urlDatabase[req.params.shortURL]['longURL']) : res.status(302).send("Resource requested has been moved or no longer exsists.");  //302 redirection code/ resource requested has been moved
+});
+
+//home page
+app.get("/", (req, res) => {
+  return req.session.userID ? res.redirect('/urls') : res.redirect('/login');
 });
 
 //gets 404 page

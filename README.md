@@ -36,5 +36,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ```
 - If a user types in a non url ––like just a random string of text–– in the create new url input, this results in an error. Given the time, regular expression could be used to fix this; however, I have not learned how to use regular expression to verify Hypertext Transfer Protocol's.
 
-- If the user is logged in they can still type /login or /register in the url and it will take them to that page. However, once logged in all front end links to the login and registration page are hidden so a user would have to go out of their way to type that into the url. Even if they do login or register when they are already logged in, it doesnt crash the program.
+- If a user is not logged in and they make a get request to /urls, the app still takes them to the urls page; however, an info alert to login or register is displayed at the top of the page.
+
+- If a user is not logged in and they make a get request to /urls/:id, the app still takes them to the short Urls page; however, the edit button is disabled from the front end and the backend doesn't allow edits either. Furthermore, from the front end, a danger alert is displayed at the top of the page.
 

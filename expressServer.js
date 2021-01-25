@@ -24,6 +24,11 @@ app.use(cookieSession({
   keys: ['123banana'] //characters the cookie name is encrypted with
 }));
 
+//home page
+app.get("/", (req, res) => {
+  return req.session.userID ? res.redirect('/urls') : res.redirect('/login');
+});
+
 //routes below
 app.get("/register", (req, res) => {
   const templateVars = {
@@ -73,16 +78,13 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //redirects to new page if longURL given by user is valid
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  longURL === undefined ? res.status(302).send("Resource requested has been moved or no longer exsists.") : res.redirect(longURL);  //302 redirection code/ resource requested has been moved
+  //if shortURL exsists redirect to shorturl at long url in user database else error
+  return urlDatabase[req.params.shortURL] ? res.redirect(urlDatabase[req.params.shortURL]['longURL']) : res.status(302).send("Resource requested has been moved or no longer exsists.");  //302 redirection code/ resource requested has been moved
 });
 
 //gets 404 page
 app.get("*", (req,res) => {
-  const templateVars = {
-    user: users[req.session.userID]
-  };
-  res.render('404', templateVars);
+  return res.status(302).send("Resource requested has been moved or no longer exsists.");
 });
 
 //updates the users edits to urls
@@ -110,7 +112,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session.userID}; //updates database object
-  return res.redirect(`u/${shortURL}`);
+  return res.redirect(`urls/${shortURL}`);
 });
 
 app.post("/register", (req, res) => {

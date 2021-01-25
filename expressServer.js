@@ -99,7 +99,7 @@ app.post("/urls/:shortURL", (req,res) => {
 
 //delete button that when requested removes URL
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
+  if (urlDatabase[req.params.shortURL] && req.session.userID) {
     delete urlDatabase[req.params.shortURL];
     return res.redirect('/urls');
   }
